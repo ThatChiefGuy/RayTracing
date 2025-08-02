@@ -27,14 +27,19 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_RIGHT]:
             self.direction.rotate_ip(self.rotation_speed)
         if keys[pygame.K_UP]:
-            self.speed = 5
+            self.speed = 2
         if keys[pygame.K_DOWN]:
-            self.speed = -5
-
-        self.rect.center += self.direction * self.speed
+            self.speed = -2
 
     def collisions(self):
-        for wall in snipets.wall_group:
-            hits = pygame.sprite.collide_rect(self, wall)
-            if hits:
-                self.rect.center -= self.direction * self.speed
+        velocity = self.direction * self.speed
+
+        # Move along X axis
+        self.rect.x += velocity.x
+        if any(self.rect.colliderect(wall.rect) for wall in snipets.wall_group):
+            self.rect.x -= velocity.x  # Undo move on X
+
+        # Move along Y axis
+        self.rect.y += velocity.y
+        if any(self.rect.colliderect(wall.rect) for wall in snipets.wall_group):
+            self.rect.y -= velocity.y
